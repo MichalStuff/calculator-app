@@ -15,21 +15,47 @@ class App extends Component {
    }
 
    handleSign = (digit) =>{
-    let display = this.state.display;
+    let {display, after} = this.state;
+    let digitPos = display.indexOf(' ');
+    let replaceDigit = display[digitPos + 1];
 
-    if((display.includes('-') && display.indexOf('-')!==0) || display.includes('+') || display.includes('*') || display.includes('/')){
+    if(((display.slice(1,display.length).includes('-')) || display.includes('+') || display.includes('*') || display.includes('/')) && after.length !== 0){
       this.calculate();
       this.setState({
         useSign : false,
       })
-    }else if(display.length === 0){
+    }else if(((display.slice(1,display.length).includes('-')) || display.includes('+') || display.includes('*') || display.includes('/')) && after.length === 0){
+      // console.log(`Replace digit ${replaceDigit}`);
+      display = display[0] + display.slice(1,display.length).replace(replaceDigit, digit)
+      this.setState({
+        display : display
+      })
+    }
+    // if(((display.includes('-') && display.indexOf('-')!==0) || display.includes('+') || display.includes('*') || display.includes('/')) && after.length !== 0){
+    //   this.calculate();
+    //   this.setState({
+    //     useSign : false,
+    //   })
+    // }else if(((display.includes('-') && display.indexOf('-') !==0) || display.includes('+') || display.includes('*') || display.includes('/')) && after.length === 0){
+    //   display = display.replace(replaceDigit, digit)
+    //   this.setState({
+    //     display : display
+    //   })
+    // }
+    // else if(display.indexOf('-') === 0 && (display.slice(1,display.length).includes('-'))){
+    //   this.setState({
+    //     display : display.concat(` ${digit} `)
+    //   })
+    //   console.log("ehm");
+    // }
+    else if(display.length === 0){
       this.setState({
         useSign : false
       })
     }
     else{
       this.setState({
-        display : display.concat(digit),
+        display : display.concat(` ${digit} `),
         useSign : true
       })
     }
@@ -47,90 +73,115 @@ class App extends Component {
     let after = this.state.after;
     let before =  this.state.before;
     let display = this.state.display;
-
-    if(this.state.useSign){
-      switch(digit){
-        case '0' :
-          if(after.length !==0){
+      if(this.state.useSign){
+        if(after.length < 9){
+          switch(digit){
+            case '0' :
+              if(after.length !==0){
+                this.setState({
+                  after : after.concat(digit),
+                  display : display.concat(digit),
+                })
+              }
+            break;
+            case '.' : 
+              if(after.includes('.')){
+                }else if(after.length === 0){
+                  after = after.concat(0);
+                  display = display.concat(0);
+                  this.setState({
+                    after : after.concat(digit),
+                    display : display.concat(digit)
+                  })
+                }else{
+                  this.setState({
+                    after : after.concat(digit),
+                    display : display.concat(digit),
+                  })
+                }
+            break;
+            default : 
             this.setState({
               after : after.concat(digit),
               display : display.concat(digit),
             })
+              break;
           }
-        break;
-        case '.' : 
-          if(after.includes('.')){
-            }else if(after.length === 0){
-              after = after.concat(0);
-              display = display.concat(0);
-              this.setState({
-                after : after.concat(digit),
-                display : display.concat(digit)
-              })
-            }else{
-              this.setState({
-                after : after.concat(digit),
-                display : display.concat(digit),
-              })
-            }
-        break;
-        default : 
-        this.setState({
-          after : after.concat(digit),
-          display : display.concat(digit),
-        })
-          break;
-      }
-    }else{
-      switch(digit){
-        case '0' :
-          if(before.length !==0){
+        }
+      }else{
+        if(before.length < 9){
+          
+          switch(digit){
+            case '0' :
+              if(before.length !==0){
+                this.setState({
+                  before : before.concat(digit),
+                  display : display.concat(digit)
+                })
+              }
+            break;
+            case '.' : 
+              if(before.includes('.')){
+                }else if(before.length === 0){
+                  before = before.concat(0);
+                  display = display.concat(0);
+                  this.setState({
+                    before : before.concat(digit),
+                    display : display.concat(digit)
+                  })
+                }else{
+                  this.setState({
+                    before : before.concat(digit),
+                    display : display.concat(digit)
+                  })
+                }
+            break;
+            default : 
             this.setState({
               before : before.concat(digit),
               display : display.concat(digit)
             })
+              break;
           }
-        break;
-        case '.' : 
-          if(before.includes('.')){
-            }else if(before.length === 0){
-              before = before.concat(0);
-              display = display.concat(0);
-              this.setState({
-                before : before.concat(digit),
-                display : display.concat(digit)
-              })
-            }else{
-              this.setState({
-                before : before.concat(digit),
-                display : display.concat(digit)
-              })
-            }
-        break;
-        default : 
-        this.setState({
-          before : before.concat(digit),
-          display : display.concat(digit)
-        })
-          break;
-      }
-    }
+        }
+        }
+
   }
 
-   calculate = () =>{
-    let result = this.state.display;
-    result = math.evaluate(result);
-    result = math.format(result, {precision: 16});
-    result = parseFloat(result);
-    result = result.toString();
-    
-    this.setState({
-      display : result,
-      after : '',
-      before : result,
-      useSign : false
+  //  calculate = () =>{
+  //   let result = this.state.display;
+  //   result = math.evaluate(result);
+  //   result = math.format(result, {precision: 16});
+  //   result = parseFloat(result);
+  //   result = result.toString();
+  //   this.setState({
+  //     display : result,
+  //     after : '',
+  //     before : result,
+  //     useSign : false
+  //   })
+  //  }
+
+    calculate = () =>{
+      let result = this.state.display;
+      result = math.evaluate(result);
+      if(result < 0){
+        result = math.format(result,{lowerExp: -5, precision: 14});
+      }else{
+        result = math.format(result,{upperExp: 10, precision: 14});
+      }
+      
+      console.log(result);
+      result = result.toString();
+      console.log(result);
+
+      this.setState({
+        display : result,
+        after : '',
+        before : result,
+        useSign : false
     })
-   }
+    }
 
    clear = () =>{
      this.setState({
@@ -145,20 +196,16 @@ class App extends Component {
     let display = this.state.display;
     let after = this.state.after;
     let before = this.state.before;
-    // display = display.slice(0,-1);
-    //  this.setState({
-    //    display : display,
-    //  })
+
      if(after.length ===0){
-      if(display[display.length-1] === '+' || display[display.length-1] === '-' || display[display.length-1] === '*' || display[display.length-1] === '/'){
-        display = display.slice(0,-1);
+      if(display[display.length-2] === '+' || display[display.length-2] === '-' || display[display.length-2] === '*' || display[display.length-2] === '/'){
+        display = display.slice(0,-3);
         this.setState({
           useSign : false
         })
       }else{
         display = display.slice(0,-1);
         before = before.slice(0,-1);
-        console.log("object");
       }
      }else{
       display = display.slice(0,-1);
@@ -172,16 +219,31 @@ class App extends Component {
 
    }
    changeSign = () =>{
-    let display = this.state.display;
-    const sign = '-+'
-    if(display.indexOf('-')){
-      display = sign[0].concat(display);
-    }else{
-      display = display.slice(1,display.length)
+    let {display, after, before} = this.state;
+
+    const sign = '-';
+
+    if(after.length === 0 && before[0] !== '-' && before.length !== 0){
+      before = sign.concat(before);
+      display = sign.concat(display);
+    }else if(before[0] === '-' && after.length === 0){
+      before = before.slice(1,before.length);
+      display = display.slice(1,display.length);
+    }else if(after[0] === '-'){
+      display = display.slice(0,display.indexOf(after));
+      after = after.slice(1,after.length);
+      display = display.concat(after);
+    }else if(after.length !== 0){
+      display = display.slice(0,display.indexOf(after));
+      after = sign.concat(after);
+      display = display.concat(after);
+
     }
-     this.setState({
-       display : display
-     })
+    this.setState({
+      before : before,
+      display : display,
+      after : after
+    })
    }
 
    pow = () =>{
@@ -203,11 +265,11 @@ class App extends Component {
    }
 
 
+
   render() { 
 
-
     return ( 
-      <div className="calculator" onKeyPress={this.keyboardEvents}>
+      <div  className="calculator" onKeyPress={this.keyboardEvents}>
         <KeyboardEventHandler
         handleKeys={['all']} 
         onKeyEvent={(key, e) => {
@@ -230,7 +292,7 @@ class App extends Component {
           }
         }} 
         />
-        <Display display={this.state.display} useSign = {this.state.useSign}/>
+        <Display display={this.state.display} useSign = {this.state.useSign} before = {this.state.before} after ={this.state.after}/>
         <KeyBoard click={this.handleButtons} calculate={this.calculate} clear={this.clear} delete={this.delete} changeSign={this.changeSign} pow={this.pow} sign={this.handleSign}/>
       </div>
     );
