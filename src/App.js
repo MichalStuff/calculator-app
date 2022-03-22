@@ -25,29 +25,11 @@ class App extends Component {
         useSign : false,
       })
     }else if(((display.slice(1,display.length).includes('-')) || display.includes('+') || display.includes('*') || display.includes('/')) && after.length === 0){
-      // console.log(`Replace digit ${replaceDigit}`);
       display = display[0] + display.slice(1,display.length).replace(replaceDigit, digit)
       this.setState({
         display : display
       })
     }
-    // if(((display.includes('-') && display.indexOf('-')!==0) || display.includes('+') || display.includes('*') || display.includes('/')) && after.length !== 0){
-    //   this.calculate();
-    //   this.setState({
-    //     useSign : false,
-    //   })
-    // }else if(((display.includes('-') && display.indexOf('-') !==0) || display.includes('+') || display.includes('*') || display.includes('/')) && after.length === 0){
-    //   display = display.replace(replaceDigit, digit)
-    //   this.setState({
-    //     display : display
-    //   })
-    // }
-    // else if(display.indexOf('-') === 0 && (display.slice(1,display.length).includes('-'))){
-    //   this.setState({
-    //     display : display.concat(` ${digit} `)
-    //   })
-    //   console.log("ehm");
-    // }
     else if(display.length === 0){
       this.setState({
         useSign : false
@@ -148,27 +130,13 @@ class App extends Component {
 
   }
 
-  //  calculate = () =>{
-  //   let result = this.state.display;
-  //   result = math.evaluate(result);
-  //   result = math.format(result, {precision: 16});
-  //   result = parseFloat(result);
-  //   result = result.toString();
-  //   this.setState({
-  //     display : result,
-  //     after : '',
-  //     before : result,
-  //     useSign : false
-  //   })
-  //  }
-
     calculate = () =>{
       let result = this.state.display;
       result = math.evaluate(result);
       if(result < 0){
-        result = math.format(result,{lowerExp: -5, precision: 14});
+        result = math.format(result,{lowerExp: -10, precision: 3});
       }else{
-        result = math.format(result,{upperExp: 10, precision: 14});
+        result = math.format(result,{upperExp: 10, precision: 3});
       }
       
       console.log(result);
